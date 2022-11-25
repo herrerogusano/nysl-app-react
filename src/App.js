@@ -30,6 +30,7 @@ const App = () =>  (
   <div>
     <Banner title={ schedule.title } />
     <CourseList courses={ schedule.courses } />
+    <p>ciao </p>
   </div>
 );
 
