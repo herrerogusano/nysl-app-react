@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
-const schedule = {
+/*const schedule = {
   "title": "CS Courses for 2018-2019",
   "courses": {
     "F101" : {
@@ -24,39 +25,65 @@ const schedule = {
       "title" : "Tech & Human Interaction"
     }
   }
-};
+};*/
 
-const App = () =>  (
-  <div>
+const App = () =>  {
+  const [schedule, setSchedule] = useState();
+  const url = 'https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php';
+
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      const response = await fetch(url);
+      if (!response.ok) throw response;
+      const json = await response.json();
+      setSchedule(json);
+    }
+    fetchSchedule();
+  }, [])
+
+  if (!schedule) return <h1>Loading schedule...</h1>;
+
+  return (
+  <div className='container'>
     <Banner title={ schedule.title } />
     <CourseList courses={ schedule.courses } />
-    <p>ciao cavaliere davi </p>
   </div>
-);
+)
+
+};
 
 const Banner = ({ title }) => (
   <h1>{ title }</h1>
 );
 
-const CourseList = ({ courses }) => (
-  <div>
-  { Object.values(courses).map(course => <Course key={course.id} course={ course } />) }
+const CourseList = ({ courses,key }) => (
+
+  
+  <div className='course-list'>
+  { Object.values(courses).map(course => <Course key ={course.title} course={ course } />) } {/* there's an error with the keys, json doesn't contain id's. */}
   </div>
 );
 
 const terms = { F: 'Fall', W: 'Winter', S: 'Spring'};
 
 const getCourseTerm = course => (
-  terms[course.id.charAt(0)]
+  course.term
 );
 
 const getCourseNumber = course => (
-  course.id.slice(1, 4)
+  course.number
 );
 
 const Course = ({ course }) => (
-  <div>
-    { getCourseTerm(course) } CS { getCourseNumber(course) }: { course.title }
+  <div className='card m-1 p-2'>
+    <div className='card-body'>
+      <div className='card-title'>
+        { getCourseTerm(course) } CS { getCourseNumber(course) }:
+      </div>
+      <div className='card-text'>
+        { course.title } 
+      </div>
+    </div>
   </div>
 );
 
