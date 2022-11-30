@@ -31,6 +31,10 @@ const App = () =>  {
   const [schedule, setSchedule] = useState();
   const url = 'https://courses.cs.northwestern.edu/394/guides/data/cs-courses.php';
 
+  /*This works but has a serious flaw. By default, the function passed to useEffect() is called whenever the component is added or updated. React apps can update the page very frequently, sometimes on every keystroke. We don't want to do a fetch everytime the component is updated. That could get our app kicked off a network service for violating service limits!
+
+  You can tell useEffect() to run the function only on updates where specific state variables have changed. You pass an array of those variables as the second argument. If no argument is given, React runs the function on all updates. If an empty list is given, then React runs the function only when the component is first added. That's what we want here: */
+
   useEffect(() => {
     const fetchSchedule = async () => {
       const response = await fetch(url);
@@ -56,15 +60,59 @@ const Banner = ({ title }) => (
   <h1>{ title }</h1>
 );
 
-const CourseList = ({ courses,key }) => (
+const CourseList = ({ courses }) => {
+  const [term, setTerm] = useState('Fall');
+  const termCourses = Object.values(courses).filter(course => term === getCourseTerm(course));
+  return (
+    <>
+    <TermSelector term={term} setTerm={setTerm} />
+    <div className='course-list'>
+    { termCourses.map(course => <Course key ={course.title} course={ course } />) } {/* there's an error with the keys, json doesn't contain id's. */}
+    </div>
+    </>
+  )
+  };
 
-  
-  <div className='course-list'>
-  { Object.values(courses).map(course => <Course key ={course.title} course={ course } />) } {/* there's an error with the keys, json doesn't contain id's. */}
+const terms = { F: 'Fall', W: 'Winter', S: 'Spring'};
+
+/* const TermSelector = ({term, setTerm}) => (
+  <div className="btn-group">
+  { 
+    Object.values(terms).map(value => (
+      <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
+    ))
+  }
   </div>
 );
 
-const terms = { F: 'Fall', W: 'Winter', S: 'Spring'};
+const TermButton = ({term, setTerm, checked}) => (
+  <>
+    <input type="radio" id={term} className="btn-check" autoComplete="off" checked={checked} onChange={()=> setTerm=(term)} />
+    <label className="btn btn-success m-1 p-2" htmlFor={term}>
+    { term }
+    </label>
+  </>
+); */
+
+const TermButton = ({term, setTerm, checked}) => (
+  <>
+    <input type="radio" id={term} className="btn-check" checked={checked} autoComplete="off"
+      onChange={() => setTerm(term)} />
+    <label class="btn btn-success m-1 p-2" htmlFor={term}>
+    { term }
+    </label>
+  </>
+);
+
+const TermSelector = ({term, setTerm}) => (
+  <div className="btn-group">
+  { 
+    Object.values(terms).map(value => (
+      <TermButton key={value} term={value} setTerm={setTerm} checked={value === term} />
+    ))
+  }
+  </div>
+);
 
 const getCourseTerm = course => (
   course.term
