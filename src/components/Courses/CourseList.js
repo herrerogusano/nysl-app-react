@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Course } from './Course';
 import { TermSelector } from '../Terms/TermSelector';
-import { getCourseTerm, terms } from '../../utilities/Utilities';
+import { getCourseTerm } from '../../utilities/Utilities';
 
 export const CourseList = ({ courses }) => {
     const [term, setTerm] = useState('Fall');
